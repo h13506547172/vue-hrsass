@@ -5,6 +5,10 @@ const whiteList = ['/login' , '/404']
 router.beforeEach((to, from, next) => {
   // 如果已登录
   if (store.state.user.token) {
+    // 获取用户信息，并且不需要持久化,有数据就不请求
+    if (!store.state.user.userInfo.userId) {
+      store.dispatch('user/asyncSetUserInfo')
+    }
     // 去登录页面跳首页
     if (to.path === '/login') return next('/')
     // 不是就正常跳转
