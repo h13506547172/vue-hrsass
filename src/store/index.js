@@ -4,7 +4,8 @@ import getters from './getters'
 import app from './modules/app'
 import settings from './modules/settings'
 import user from './modules/user'
-
+// 持久化存储
+import createVuexPersisted from 'vuex-persistedstate'
 Vue.use(Vuex)
 
 const store = new Vuex.Store({
@@ -13,7 +14,19 @@ const store = new Vuex.Store({
     settings,
     user
   },
-  getters
+  getters,
+  plugins: [
+    // 默认是所有vuex模块中的state的值存入本地
+    createVuexPersisted({
+      reducer(state) {
+        return {
+          user: {
+            token: state.user.token
+          }
+        }
+      }
+    })
+  ]
 })
 
 export default store

@@ -84,8 +84,10 @@ export default {
           try {
             this.isLoading = true
             await this.$store.dispatch('user/asyncSetToken', this.formLogin)
-              this.$router.push('/')
+            this.$router.push('/')
+            if (this.$store.state.user.token) {
               this.$message.success('登录成功')
+            }
           } finally {
             this.isLoading = false
           }
