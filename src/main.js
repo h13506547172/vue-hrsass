@@ -14,11 +14,26 @@ import router from './router'
 
 import '@/icons' // icon
 import '@/permission' // permission control
+import * as directives from '@/directives/index'
 // 模拟假数据的
 if (process.env.NODE_ENV === 'production') {
   const { mockXHR } = require('../mock')
   mockXHR()
 }
+
+// 循环添加 自定义指令
+for (const key in directives) {
+  Vue.directive(key, directives[key])
+}
+// Vue.directive('imgError', {
+//   inserted(el, binding) {
+//     // 404的时候,修改src为默认图片
+//     el.onerror = () => {
+//       // binding.value包含用户传递过来的值
+//       el.src = binding.value
+//     }
+//   }
+// })
 
 // set ElementUI lang to EN
 Vue.use(ElementUI, { locale })
@@ -31,5 +46,5 @@ new Vue({
   el: '#app',
   router,
   store,
-  render: h => h(App)
+  render: (h) => h(App)
 })

@@ -17,8 +17,9 @@
           <img
             :src="$store.state.user.userInfo.staffPhoto"
             class="user-avatar"
+            v-imgError="defaultImg"
           />
-          <span>{{$store.state.user.userInfo.companyName}}</span>
+          <span>{{ $store.state.user.userInfo.companyName }}</span>
           <i class="el-icon-caret-bottom" />
         </div>
         <el-dropdown-menu slot="dropdown" class="user-dropdown">
@@ -38,8 +39,13 @@
 import { mapGetters } from 'vuex'
 import Breadcrumb from '@/components/Breadcrumb'
 import Hamburger from '@/components/Hamburger'
-
+import defaultImg from '@/assets/common/68775e15bc12b22a0c38d8d556863767.jpeg'
 export default {
+  data() {
+    return {
+      defaultImg
+    }
+  },
   components: {
     Breadcrumb,
     Hamburger
