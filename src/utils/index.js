@@ -115,3 +115,25 @@ export function param2Obj(url) {
   })
   return obj
 }
+
+/**
+ * 
+ * @param {*} list 
+ * @param {*} 一级父id
+ * @returns 树状数组
+ */
+export const dataToTress = (list, pid) => {
+  let newList = [];
+  list.forEach((item) => {
+    // 第一次将一级节点放入数组
+    if (item.pid === pid) {
+      // 再把自己的id传入函数，看看有没有自己的子节点
+      const children = dataToTress(list, item.id);
+      if (children.length) {
+        item.children = children;
+      }
+      newList.push(item);
+    }
+  });
+  return newList;
+};

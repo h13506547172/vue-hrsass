@@ -2,40 +2,69 @@
   <div class="dashboard-container">
     <div class="app-container">
       <el-card class="box-card">
-        <el-row type="flex">
-          <el-col>传智教育</el-col>
-          <el-col :span="5">
-            <el-row type="flex">
-              <el-col>负责人</el-col>
-              <el-col>
-                <el-dropdown>
-                  <span class="el-dropdown-link">
-                    操作<i class="el-icon-arrow-down el-icon--right"></i>
-                  </span>
-                  <el-dropdown-menu slot="dropdown">
-                    <el-dropdown-item>添加部门</el-dropdown-item>
-                    <el-dropdown-item>删除部门</el-dropdown-item>
-                    <el-dropdown-item>编辑部门</el-dropdown-item>
-                  </el-dropdown-menu>
-                </el-dropdown>
-              </el-col>
-            </el-row>
-          </el-col>
-        </el-row>
+        <!-- 头部 -->
+        <TreeTools
+          :nodeName="{ name: '传值教育', manager: '负责人' }"
+          :isRoot="false"
+          @add="dialogVisible = true"
+        ></TreeTools>
+        <!-- 树形 -->
+        <el-tree :data="treeData" :props="defaultProps">
+          <template v-slot="scope">
+            <TreeTools
+              :nodeName="scope.data"
+              :isRoot="true"
+              @remove="getDepartment"
+              @add="dialogVisible = true"
+            ></TreeTools>
+          </template>
+        </el-tree>
+        <!-- 添加弹出层 -->
+        <addPop :dialogVisible="dialogVisible"></addPop>
       </el-card>
     </div>
   </div>
 </template>
 
 <script>
+import TreeTools from './components/tree-tools.vue'
+import { getDepartmentAPI } from '@/api/departments'
+// 引入转换树状数组的方法
+import { dataToTress } from '@/utils'
+import addPop from './components/addPop.vue'
 export default {
+  components: {
+    TreeTools,
+    addPop
+  },
   data() {
-    return {}
+    return {
+      treeData: [
+        { name: '总裁办', children: [{ name: '董事会' }] },
+        { name: '行政部' },
+        { name: '人事部' }
+      ],
+      defaultProps: {
+        label: 'name'
+      },
+      isRoot: true,
+      // 添加弹出层
+      dialogVisible: false
+    }
   },
 
-  created() {},
+  created() {
+    this.getDepartment()
+  },
 
-  methods: {}
+  methods: {
+    // 获取数据
+    async getDepartment() {
+      const data = await getDepartmentAPI()
+      // console.log(data)
+      this.treeData = dataToTress(data.depts, '')
+    }
+  }
 }
 </script>
 
