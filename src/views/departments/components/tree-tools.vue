@@ -10,7 +10,7 @@
               操作<i class="el-icon-arrow-down el-icon--right"></i>
             </span>
             <el-dropdown-menu slot="dropdown">
-              <el-dropdown-item @click.native="$emit('add')">添加部门</el-dropdown-item>
+              <el-dropdown-item @click.native="$emit('add',nodeName)">添加部门</el-dropdown-item>
               <!-- template只是一个包装元素，不会生成节点 -->
               <template v-if="isRoot">
                 <el-dropdown-item @click.native="removeFn"

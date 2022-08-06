@@ -15,12 +15,17 @@
               :nodeName="scope.data"
               :isRoot="true"
               @remove="getDepartment"
-              @add="dialogVisible = true"
+              @add="passNode"
             ></TreeTools>
           </template>
         </el-tree>
         <!-- 添加弹出层 -->
-        <addPop :dialogVisible="dialogVisible"></addPop>
+        <addPop
+          :dialogVisible="dialogVisible"
+          :curNode="curNode"
+          @updata="dialogVisible = $event"
+          @success='getDepartment'
+        ></addPop>
       </el-card>
     </div>
   </div>
@@ -49,7 +54,9 @@ export default {
       },
       isRoot: true,
       // 添加弹出层
-      dialogVisible: false
+      dialogVisible: false,
+      // 传递的部门数据
+      curNode: {}
     }
   },
 
@@ -63,6 +70,12 @@ export default {
       const data = await getDepartmentAPI()
       // console.log(data)
       this.treeData = dataToTress(data.depts, '')
+    },
+    // 点击添加部门，传递部门信息
+    passNode(val) {
+      this.dialogVisible = true
+      // console.log(val)
+      this.curNode = val
     }
   }
 }
