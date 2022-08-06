@@ -9,22 +9,24 @@
           @add="dialogVisible = true"
         ></TreeTools>
         <!-- 树形 -->
-        <el-tree :data="treeData" :props="defaultProps">
+        <el-tree :data="treeData" :props="defaultProps" v-loading="loading">
           <template v-slot="scope">
             <TreeTools
               :nodeName="scope.data"
               :isRoot="true"
               @remove="getDepartment"
               @add="passNode"
+              @edit="editFn"
             ></TreeTools>
           </template>
         </el-tree>
         <!-- 添加弹出层 -->
         <addPop
+          ref="addPop"
           :dialogVisible="dialogVisible"
           :curNode="curNode"
           @updata="dialogVisible = $event"
-          @success='getDepartment'
+          @success="getDepartment"
         ></addPop>
       </el-card>
     </div>
@@ -56,7 +58,9 @@ export default {
       // 添加弹出层
       dialogVisible: false,
       // 传递的部门数据
-      curNode: {}
+      curNode: {},
+      // 加载
+      loading: false
     }
   },
 
@@ -67,15 +71,23 @@ export default {
   methods: {
     // 获取数据
     async getDepartment() {
+      this.loading = true
       const data = await getDepartmentAPI()
       // console.log(data)
       this.treeData = dataToTress(data.depts, '')
+      this.loading = false
     },
     // 点击添加部门，传递部门信息
     passNode(val) {
       this.dialogVisible = true
       // console.log(val)
       this.curNode = val
+    },
+    // 编辑部门
+    editFn(val) {
+      this.dialogVisible = true
+      // 调用子组件的方法
+      this.$refs.addPop.getDeptById(val.id)
     }
   }
 }

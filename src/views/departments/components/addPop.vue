@@ -1,5 +1,10 @@
 <template>
-  <el-dialog title="提示" :visible="dialogVisible" width="50%" @close="onClose">
+  <el-dialog
+    :title="popTitle"
+    :visible="dialogVisible"
+    width="50%"
+    @close="onClose"
+  >
     <el-form ref="form" label-width="100px" :model="formData" :rules="rules">
       <el-form-item label="部门名称" prop="name">
         <el-input
@@ -43,9 +48,19 @@
 </template>
 
 <script>
-import { getDepartmentAPI, addDepartmentAPI } from '@/api/departments'
+import {
+  getDepartmentAPI,
+  addDepartmentAPI,
+  getDepartmentInfoAPI,
+  editDepartmentInfoAPI
+} from '@/api/departments'
 import { getEmployeesAPI } from '@/api/employees'
 export default {
+  computed: {
+    popTitle() {
+      return this.formData.id ? '编辑部门' : '添加部门'
+    }
+  },
   props: {
     // 控制弹出层显示和隐藏
     dialogVisible: {
@@ -73,13 +88,29 @@ export default {
         name: [
           { required: true, message: '请输入部门名称', trigger: 'blur' },
           {
-            validator: (rule, value, callback) => {
-              if (!this.curNode.children) return callback()
-              // 判断子部门是否存在
-              const boolean = this.curNode.children.some(
-                (item) => item.name === value
-              )
-              boolean ? callback(new Error('部门重复')) : callback()
+            validator: async (rule, value, callback) => {
+              // 判断是编辑还是添加部门
+              if (this.formData.id) {
+                const { depts } = await getDepartmentAPI()
+                // console.log(depts)
+                const filterArr = depts.filter(
+                  (item) =>
+                    item.pid == this.formData.pid &&
+                    item.id !== this.formData.id
+                )
+                // console.log(filterArr)
+                const boolean = filterArr.some(
+                  (item) => item.name === this.formData.name
+                )
+                boolean ? callback(new Error('部门重复')) : callback()
+              } else {
+                if (!this.curNode.children) return callback()
+                // 判断子部门是否存在
+                const boolean = this.curNode.children.some(
+                  (item) => item.name === value
+                )
+                boolean ? callback(new Error('部门重复')) : callback()
+              }
             },
             trigger: 'blur'
           }
@@ -91,7 +122,15 @@ export default {
               // 判断部门编号是否重复
               const { depts } = await getDepartmentAPI()
               // console.log(depts)
-              const boolean = depts.some((item) => item.code === value)
+              let boolean
+              // 如果id存在就是编辑
+              if (this.formData.id) {
+                const depts1 = depts.filter((item) => item.id !== this.formData.id)
+                boolean = depts1.some((item) => item.code === value)
+              } else {
+                boolean = depts.some((item) => item.code === value)
+              }
+
               boolean ? callback(new Error('部门编码重复')) : callback()
             },
             trigger: 'blur'
@@ -121,10 +160,27 @@ export default {
     // 关闭弹窗的函数
     onClose() {
       // console.log(111)
+      // 并清空添加面板
+      this.$refs.form.resetFields()
+      this.formData = {
+        name: '',
+        code: '',
+        manager: '',
+        introduce: ''
+      }
       this.$emit('updata', false)
     },
+    // 按下确定时触发的函数
     async onSave() {
-      this.$refs.form.validate()
+      await this.$refs.form.validate()
+      // 判断是添加还是编辑
+      if (this.formData.id) {
+        await editDepartmentInfoAPI(this.formData.id, this.formData)
+        this.onClose()
+        this.$message.success('添加部门成功')
+        this.$emit('success')
+        return
+      }
       this.formData.pid = this.curNode.id
       // console.log(this.formData)
       try {
@@ -133,6 +189,7 @@ export default {
         this.$message.success('添加部门成功')
         this.$emit('success')
         // 添加成功刷新数据，并清空添加面板
+        this.$refs.form.resetFields()
         this.formData = {
           name: '',
           code: '',
@@ -140,8 +197,13 @@ export default {
           introduce: ''
         }
       } catch (error) {
-        this.$message.error('添加部门失败')
+        this.$message.error('修改部门失败')
       }
+    },
+    // 点击编辑时触发函数获取id
+    async getDeptById(id) {
+      // console.log(id)
+      this.formData = await getDepartmentInfoAPI(id)
     }
   }
 }

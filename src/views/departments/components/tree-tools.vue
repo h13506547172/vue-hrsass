@@ -16,7 +16,7 @@
                 <el-dropdown-item @click.native="removeFn"
                   >删除部门</el-dropdown-item
                 >
-                <el-dropdown-item>编辑部门</el-dropdown-item>
+                <el-dropdown-item @click.native="editFn">编辑部门</el-dropdown-item>
               </template>
             </el-dropdown-menu>
           </el-dropdown>
@@ -62,6 +62,10 @@ export default {
           message: '删除成功!'
         })
       } catch (error) {}
+    },
+    editFn(){
+      // 传递节点的信息
+      this.$emit('edit',this.nodeName)
     }
   }
 }
