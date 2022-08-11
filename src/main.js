@@ -15,6 +15,7 @@ import router from './router'
 import '@/icons' // icon
 import '@/permission' // permission control
 import * as directives from '@/directives/index'
+import component from "@/components/index";
 // 模拟假数据的
 if (process.env.NODE_ENV === 'production') {
   const { mockXHR } = require('../mock')
@@ -25,16 +26,7 @@ if (process.env.NODE_ENV === 'production') {
 for (const key in directives) {
   Vue.directive(key, directives[key])
 }
-// Vue.directive('imgError', {
-//   inserted(el, binding) {
-//     // 404的时候,修改src为默认图片
-//     el.onerror = () => {
-//       // binding.value包含用户传递过来的值
-//       el.src = binding.value
-//     }
-//   }
-// })
-
+Vue.use(component)
 // set ElementUI lang to EN
 Vue.use(ElementUI, { locale })
 // 如果想要中文版 element-ui，按如下方式声明
