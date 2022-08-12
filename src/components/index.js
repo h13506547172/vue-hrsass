@@ -1,5 +1,6 @@
 import PageTools from './PageTools'
-const components = [PageTools]
+import UpdateExcel from "./UpdateExcel";
+const components = [PageTools,UpdateExcel]
 export default {
   install(Vue) {
     components.forEach((component) => {

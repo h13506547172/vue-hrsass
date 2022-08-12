@@ -14,8 +14,11 @@ import router from './router'
 
 import '@/icons' // icon
 import '@/permission' // permission control
+// 组件、自定义指令、过滤器
 import * as directives from '@/directives/index'
-import component from "@/components/index";
+import component from '@/components/index'
+import * as filters from '@/filters/index'
+
 // 模拟假数据的
 if (process.env.NODE_ENV === 'production') {
   const { mockXHR } = require('../mock')
@@ -26,6 +29,10 @@ if (process.env.NODE_ENV === 'production') {
 for (const key in directives) {
   Vue.directive(key, directives[key])
 }
+for (const key in filters) {
+  Vue.filter(key, filters[key])
+}
+// 注册组件
 Vue.use(component)
 // set ElementUI lang to EN
 Vue.use(ElementUI, { locale })
