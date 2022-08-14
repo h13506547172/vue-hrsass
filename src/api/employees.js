@@ -39,3 +39,11 @@ export function getEmployeesListAPI(params) {
     data
   })
 }
+
+export function batchAddEmployeeAPI(data) {
+  return request({
+    method: 'post',
+    url: '/sys/user/batch',
+    data
+  })
+}
