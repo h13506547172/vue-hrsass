@@ -47,3 +47,28 @@ export function batchAddEmployeeAPI(data) {
     data
   })
 }
+
+//  保存员工基本信息 
+export function saveEmployeeInfoAPI(id,data) {
+  return request({
+    method: 'PUT',
+    url: `/sys/user/${id}`,
+    data
+  })
+}
+
+// 获取员工个人信息 /employees/{id}/personalInfo
+export function getEmployeesPersonalInfoAPI(id) {
+  return request({
+    url: `/employees/${id}/personalInfo`,
+    method: 'GET'
+  })
+}
+// 保存员工个人信息 /employees/{id}/personalInfo
+export function saveEmployeePersonalInfoAPI(id,data) {
+  return request({
+    method: 'PUT',
+    url: `/employees/${id}/personalInfo`,
+    data
+  })
+}
