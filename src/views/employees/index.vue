@@ -4,8 +4,15 @@
       <page-tools>
         <span slot="left">共166条记录</span>
         <template slot="right">
-          <el-button size="small" type="warning" @click="$router.push('/import')">导入</el-button>
-          <el-button size="small" type="danger">导出</el-button>
+          <el-button
+            size="small"
+            type="warning"
+            @click="$router.push('/import')"
+            >导入</el-button
+          >
+          <el-button size="small" type="danger" @click="exportExcelFn"
+            >导出</el-button
+          >
           <el-button size="small" type="primary" @click="addDialogShow = true"
             >新增员工</el-button
           >
@@ -88,6 +95,7 @@
 <script>
 import { delEmployeeAPI, getEmployeesListAPI } from '@/api/employees'
 import employees from '@/constant/employees'
+const { exportExcelMapPath, hireType } = employees
 import AddDialog from './components/AddDialog.vue'
 export default {
   name: 'Employees',
@@ -136,6 +144,32 @@ export default {
       await delEmployeeAPI(id)
       this.$message.success('删除成功')
       this.getEmployeesList()
+    },
+    // 导出Excel文件
+    async exportExcelFn() {
+      // 导出功能
+      const { export_json_to_excel } = await import('@/ventor/exportExcel')
+      const { rows } = await getEmployeesListAPI(1, this.total)
+      const keyList = Object.keys(exportExcelMapPath)
+      const res = rows.map((item) => {
+        // 生成和员工数量的一级数组，有几个员工生成几个item
+        return keyList.map((item1) => {
+          if (item1 === '聘用形式') {
+            if (item[exportExcelMapPath[item1]] == 1) return '正式'
+            if (item[exportExcelMapPath[item1]] == 2) return '非正式'
+            return '未知'
+          }
+          // item中存放和表头数量相等的数据
+          return item[exportExcelMapPath[item1]]
+        })
+      })
+      export_json_to_excel({
+        header: keyList,
+        data: res,
+        filename: '员工薪资表',
+        autoWidth: true,
+        bookType: 'xlsx'
+      })
     }
   }
 }

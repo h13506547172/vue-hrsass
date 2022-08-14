@@ -4,26 +4,26 @@ import request from '@/utils/request'
 export function getEmployeesAPI() {
   return request({
     url: '/sys/user/simple',
-    method: 'GET',
+    method: 'GET'
   })
 }
 /**
  * 获取员工信息列表
  * @param {*} params { page: 1 size: 10}
- * @returns 
+ * @returns
  */
-export function getEmployeesListAPI(params) {
+export function getEmployeesListAPI(page, size) {
   return request({
     url: '/sys/user',
     method: 'GET',
-    params
+    params: { page: page, size: size }
   })
 }
 
 /**
  * 删除员工接口
  * ****/
- export function delEmployeeAPI(id) {
+export function delEmployeeAPI(id) {
   return request({
     url: `/sys/user/${id}`,
     method: 'delete'
@@ -32,7 +32,7 @@ export function getEmployeesListAPI(params) {
 /** **
  *  新增员工的接口
  * **/
- export function addEmployeeAPI(data) {
+export function addEmployeeAPI(data) {
   return request({
     method: 'post',
     url: '/sys/user',
