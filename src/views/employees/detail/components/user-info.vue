@@ -53,11 +53,12 @@
           </el-form-item>
         </el-col>
       </el-row>
-      <!-- 员工照片 -->
+      <!-- 员工头像 -->
       <el-row class="inline-info">
         <el-col :span="12">
           <el-form-item label="员工头像">
             <!-- 放置上传图片 -->
+            <UploadImg ref="headImg" @onSuccess="headImgSuccess"></UploadImg>
           </el-form-item>
         </el-col>
       </el-row>
@@ -88,9 +89,9 @@
         </el-form-item>
         <!-- 个人头像 -->
         <!-- 员工照片 -->
-
         <el-form-item label="员工照片">
           <!-- 放置上传图片 -->
+          <UploadImg ref="photo" @onSuccess="photoSuccess"></UploadImg>
         </el-form-item>
         <el-form-item label="国家/地区">
           <el-select v-model="formData.nationalArea" class="inputW2">
@@ -376,7 +377,9 @@
         <!-- 保存员工信息 -->
         <el-row class="inline-info" type="flex" justify="center">
           <el-col :span="12">
-            <el-button type="primary" @click="onSavePersonalInfo">保存更新</el-button>
+            <el-button type="primary" @click="onSavePersonalInfo"
+              >保存更新</el-button
+            >
             <el-button @click="$router.back()">返回</el-button>
           </el-col>
         </el-row>
@@ -473,17 +476,37 @@ export default {
   methods: {
     async getUserMoreInfo() {
       this.userInfo = await getUserMoreInfoAPI(this.userId)
+      if (this.userInfo.staffPhoto) {
+        this.$refs.headImg.fileList.push({ url: this.userInfo.staffPhoto })
+      }
     },
     async getEmployeesPersonalInfo() {
       this.formData = await getEmployeesPersonalInfoAPI(this.userId)
+      if (this.formData.staffPhoto) {
+        this.$refs.photo.fileList.push({ url: this.formData.staffPhoto })
+      }
+    },
+    // 头像上传成功更换url地址
+    headImgSuccess({ url }) {
+      this.userInfo.staffPhoto = url
+    },
+    // 照片上传成功更换url地址
+    photoSuccess({ url }) {
+      this.formData.staffPhoto = url
     },
     // 保存上半部分
     async onSave() {
+      if (this.$refs.headImg.loading) {
+        return this.$message.error('头像正在上传中。。。')
+      }
       await saveEmployeeInfoAPI(this.$route.params.id, this.userInfo)
       this.$message.success('更新信息成功')
     },
     // 保存下半部分
     async onSavePersonalInfo() {
+      if (this.$refs.photo.loading) {
+        return this.$message.error('头像正在上传中。。。')
+      }
       await saveEmployeePersonalInfoAPI(this.$route.params.id, this.formData)
       this.$message.success('更新信息成功')
     }
