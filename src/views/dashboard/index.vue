@@ -1,6 +1,6 @@
 <template>
   <div>
-    <UploadImg @onSuccess="onSuccessFn"></UploadImg>
+
   </div>
 </template>
 
@@ -13,9 +13,7 @@ export default {
   created() {},
 
   methods: {
-    onSuccessFn(val) {
-      console.log(val)
-    }
+
   }
 }
 </script>

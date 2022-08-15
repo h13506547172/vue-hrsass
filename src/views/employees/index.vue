@@ -32,6 +32,7 @@
                 :src="row.staffPhoto"
                 alt=""
                 class="imgA"
+                @click="showDialogImg(row)"
               />
             </template>
           </el-table-column>
@@ -97,6 +98,9 @@
       </el-card>
       <!-- 新增员工对话框 -->
       <AddDialog :addDialogShow.sync="addDialogShow"></AddDialog>
+      <el-dialog title="头像二维码" :visible.sync="QRcodeShow">
+        <canvas id="canvas"></canvas>
+      </el-dialog>
     </div>
   </div>
 </template>
@@ -106,6 +110,8 @@ import { delEmployeeAPI, getEmployeesListAPI } from '@/api/employees'
 import employees from '@/constant/employees'
 const { exportExcelMapPath, hireType } = employees
 import AddDialog from './components/AddDialog.vue'
+// 引入生成图片二维码的
+import QRCode from "qrcode";
 export default {
   name: 'Employees',
   data() {
@@ -114,7 +120,9 @@ export default {
       pages: { page: 1, size: 10 },
       total: 10,
       // 新增员工对话框
-      addDialogShow: false
+      addDialogShow: false,
+      // 二维码弹出层
+      QRcodeShow: false
     }
   },
   components: {
@@ -178,6 +186,18 @@ export default {
         filename: '员工薪资表',
         autoWidth: true,
         bookType: 'xlsx'
+      })
+    },
+    // 显示头像二维码的弹窗
+    showDialogImg(row) {
+      // console.log(row)
+      if (!row.staffPhoto) {
+        return this.$message.error('该用户没有头像')
+      }
+      this.QRcodeShow = true
+      this.$nextTick(()=>{
+        const canvas = document.getElementById('canvas')
+        QRCode.toCanvas(canvas, row.staffPhoto)
       })
     }
   }
