@@ -21,6 +21,18 @@ export function getUserInfoAPI() {
 export function getUserMoreInfoAPI(id) {
   return request({
     url: '/sys/user/' + id,
-    method: 'GET',
+    method: 'GET'
+  })
+}
+
+// 给用户分配角色 /sys/user/assignRoles
+export function assignRolesAPI(id, roleIds) {
+  return request({
+    url: '/sys/user/assignRoles',
+    method: 'PUT',
+    data: {
+      id,
+      roleIds
+    }
   })
 }

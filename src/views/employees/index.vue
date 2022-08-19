@@ -74,7 +74,9 @@
               <el-button type="text" size="small">转正</el-button>
               <el-button type="text" size="small">调岗</el-button>
               <el-button type="text" size="small">离职</el-button>
-              <el-button type="text" size="small">角色</el-button>
+              <el-button type="text" size="small" @click="allotRoleFn(row.id)"
+                >角色</el-button
+              >
               <el-button type="text" size="small" @click="delEmployee(row.id)"
                 >删除</el-button
               >
@@ -102,16 +104,20 @@
         <canvas id="canvas"></canvas>
       </el-dialog>
     </div>
+    <!-- 分配角色对话框 -->
+    <allotRole :allotRoleShow.sync="allotRoleShow" :roleIds='roleIds' :userId='userId'></allotRole>
   </div>
 </template>
 
 <script>
 import { delEmployeeAPI, getEmployeesListAPI } from '@/api/employees'
+import { getUserMoreInfoAPI } from "@/api/user";
 import employees from '@/constant/employees'
 const { exportExcelMapPath, hireType } = employees
 import AddDialog from './components/AddDialog.vue'
 // 引入生成图片二维码的
-import QRCode from "qrcode";
+import QRCode from 'qrcode'
+import allotRole from './components/allotRole.vue'
 export default {
   name: 'Employees',
   data() {
@@ -122,11 +128,17 @@ export default {
       // 新增员工对话框
       addDialogShow: false,
       // 二维码弹出层
-      QRcodeShow: false
+      QRcodeShow: false,
+      // 角色分配
+      allotRoleShow: false,
+      // 权限角色信息
+      roleIds: [],
+      userId: ''
     }
   },
   components: {
-    AddDialog
+    AddDialog,
+    allotRole
   },
   created() {
     this.getEmployeesList()
@@ -195,10 +207,18 @@ export default {
         return this.$message.error('该用户没有头像')
       }
       this.QRcodeShow = true
-      this.$nextTick(()=>{
+      this.$nextTick(() => {
         const canvas = document.getElementById('canvas')
         QRCode.toCanvas(canvas, row.staffPhoto)
       })
+    },
+    // 分配角色
+    async allotRoleFn(id) {
+      const res = await getUserMoreInfoAPI(id)
+      // console.log(res)
+      this.userId = id
+      this.roleIds = res.roleIds
+      this.allotRoleShow = true
     }
   }
 }

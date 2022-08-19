@@ -30,7 +30,9 @@
             >
             </el-table-column>
             <el-table-column align="center" label="操作" width="450">
-              <el-button size="small" type="success">分配权限</el-button>
+              <el-button size="small" type="success" @click="allotdialogShowFn"
+                >分配权限</el-button
+              >
               <el-button size="small" type="primary">编辑</el-button>
               <el-button size="small" type="danger">删除</el-button>
             </el-table-column>
@@ -99,13 +101,36 @@
           <el-button type="primary" @click="addFn">确 定</el-button>
         </span>
       </el-dialog>
+      <!-- 分配权限对话框 -->
+      <el-dialog
+        title="提示"
+        :visible.sync="allotdialogShow"
+        width="40%"
+        :before-close="onClose"
+      >
+        <el-tree
+          :data="treeData"
+          :props="defaultProps"
+          show-checkbox
+          default-expand-all
+          node-key="id"
+          :default-checked-keys="defaultList"
+        ></el-tree>
+        <span slot="footer" class="dialog-footer">
+          <el-button @click="onClose">取 消</el-button>
+          <el-button type="primary">确 定</el-button>
+        </span>
+      </el-dialog>
     </div>
   </div>
 </template>
 
 <script>
 import { addSysRoleAPI, getCompanyInfoAPI, getSysRoleAPI } from '@/api/setting'
+import { getPermissionListAPI } from '@/api/permission'
+import { dataToTress } from '@/utils/index'
 export default {
+  name: 'setting',
   data() {
     return {
       activeName: 'first',
@@ -124,13 +149,22 @@ export default {
         name: [{ required: true, message: '请输入活动名称', trigger: 'blur' }]
       },
       // 公司信息
-      companyInfo: {}
+      companyInfo: {},
+      // 分配权限对话框
+      allotdialogShow: false,
+      defaultProps: {
+        children: 'children',
+        label: 'name'
+      },
+      treeData: [],
+      defaultList: ['1', '1063315016368918528']
     }
   },
 
   async created() {
     await this.getCompanyInfo()
     await this.getSysRole(this.curPage, this.pagesize)
+    await this.getPermissionList()
   },
 
   methods: {
@@ -172,6 +206,19 @@ export default {
       )
       // console.log(data)
       this.companyInfo = data
+    },
+    // 分配权限对话框
+    onClose() {
+      this.allotdialogShow = false
+    },
+    allotdialogShowFn() {
+      this.allotdialogShow = true
+    },
+    // 获取角色权限列表
+    async getPermissionList() {
+      const data = await getPermissionListAPI()
+      console.log(data)
+      this.treeData = dataToTress(data, '0')
     }
   }
 }
