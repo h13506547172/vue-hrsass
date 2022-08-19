@@ -12,11 +12,11 @@ export function getEmployeesAPI() {
  * @param {*} params { page: 1 size: 10}
  * @returns
  */
-export function getEmployeesListAPI(page, size) {
+export function getEmployeesListAPI(params) {
   return request({
     url: '/sys/user',
     method: 'GET',
-    params: { page: page, size: size }
+    params
   })
 }
 

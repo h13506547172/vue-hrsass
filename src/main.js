@@ -18,6 +18,8 @@ import '@/permission' // permission control
 import * as directives from '@/directives/index'
 import component from '@/components/index'
 import * as filters from '@/filters/index'
+// 打印
+import Print from 'vue-print-nb'
 
 // 模拟假数据的
 if (process.env.NODE_ENV === 'production') {
@@ -32,6 +34,8 @@ for (const key in directives) {
 for (const key in filters) {
   Vue.filter(key, filters[key])
 }
+
+Vue.use(Print)
 // 注册组件
 Vue.use(component)
 // set ElementUI lang to EN
