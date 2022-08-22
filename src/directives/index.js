@@ -25,3 +25,14 @@ export const imgError = {
     }
   }
 }
+import store from '@/store/index'
+// 按钮权限自定义指令
+export const isHave = {
+  inserted(el, binding) {
+    const have = store.state.permission.points.includes(binding.value)
+    // 没有权限
+    if (!have) {
+      el.remove()
+    }
+  }
+}

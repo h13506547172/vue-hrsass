@@ -5,6 +5,7 @@
         <!-- 角色管理tab页面 -->
         <el-tab-pane label="角色管理" name="first">
           <el-button type="primary" @click="addDialogVisible = true"
+          :disabled="!isDisabled(roles.add)"
             >新增角色</el-button
           >
           <el-table :data="tableData" style="width: 100%">
@@ -37,7 +38,7 @@
                   @click="allotdialogShowFn(row.id)"
                   >分配权限</el-button
                 >
-                <el-button size="small" type="primary">编辑</el-button>
+                <el-button size="small" type="primary" :disabled="!isDisabled(roles.edit)">编辑</el-button>
                 <el-button size="small" type="danger">删除</el-button>
               </template>
             </el-table-column>
@@ -142,8 +143,10 @@ import {
 } from '@/api/setting'
 import { getPermissionListAPI } from '@/api/permission'
 import { dataToTress } from '@/utils/index'
+import mixinPermisson from "@/mixin/permisson";
 export default {
   name: 'setting',
+  mixins: [mixinPermisson],
   data() {
     return {
       activeName: 'first',

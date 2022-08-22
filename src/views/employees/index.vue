@@ -8,12 +8,21 @@
             size="small"
             type="warning"
             @click="$router.push('/import')"
+            :disabled="!isDisabled(btnMapPermission.import)"
             >导入</el-button
           >
-          <el-button size="small" type="danger" @click="exportExcelFn"
+          <el-button
+            size="small"
+            type="danger"
+            @click="exportExcelFn"
+            v-isHave='btnMapPermission.export'
             >导出</el-button
           >
-          <el-button size="small" type="primary" @click="addDialogShow = true"
+          <el-button
+            size="small"
+            type="primary"
+            @click="addDialogShow = true"
+            v-isHave='btnMapPermission.add'
             >新增员工</el-button
           >
         </template>
@@ -77,7 +86,11 @@
               <el-button type="text" size="small" @click="allotRoleFn(row.id)"
                 >角色</el-button
               >
-              <el-button type="text" size="small" @click="delEmployee(row.id)"
+              <el-button
+                type="text"
+                size="small"
+                @click="delEmployee(row.id)"
+                :disabled="!isDisabled(btnMapPermission.delete)"
                 >删除</el-button
               >
             </template>
@@ -105,19 +118,25 @@
       </el-dialog>
     </div>
     <!-- 分配角色对话框 -->
-    <allotRole :allotRoleShow.sync="allotRoleShow" :roleIds='roleIds' :userId='userId'></allotRole>
+    <allotRole
+      :allotRoleShow.sync="allotRoleShow"
+      :roleIds="roleIds"
+      :userId="userId"
+    ></allotRole>
   </div>
 </template>
 
 <script>
 import { delEmployeeAPI, getEmployeesListAPI } from '@/api/employees'
-import { getUserMoreInfoAPI } from "@/api/user";
+import { getUserMoreInfoAPI } from '@/api/user'
 import employees from '@/constant/employees'
 const { exportExcelMapPath, hireType } = employees
 import AddDialog from './components/AddDialog.vue'
 // 引入生成图片二维码的
 import QRCode from 'qrcode'
 import allotRole from './components/allotRole.vue'
+// 混入按钮权限
+import mixinPermisson from '@/mixin/permisson'
 export default {
   name: 'Employees',
   data() {
@@ -136,6 +155,7 @@ export default {
       userId: ''
     }
   },
+  mixins: [mixinPermisson],
   components: {
     AddDialog,
     allotRole
