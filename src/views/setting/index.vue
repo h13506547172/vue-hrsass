@@ -30,11 +30,16 @@
             >
             </el-table-column>
             <el-table-column align="center" label="操作" width="450">
-              <el-button size="small" type="success" @click="allotdialogShowFn"
-                >分配权限</el-button
-              >
-              <el-button size="small" type="primary">编辑</el-button>
-              <el-button size="small" type="danger">删除</el-button>
+              <template #default="{ row }">
+                <el-button
+                  size="small"
+                  type="success"
+                  @click="allotdialogShowFn(row.id)"
+                  >分配权限</el-button
+                >
+                <el-button size="small" type="primary">编辑</el-button>
+                <el-button size="small" type="danger">删除</el-button>
+              </template>
             </el-table-column>
           </el-table>
           <!-- 分页 -->
@@ -107,6 +112,7 @@
         :visible.sync="allotdialogShow"
         width="40%"
         :before-close="onClose"
+        destroy-on-close
       >
         <el-tree
           :data="treeData"
@@ -115,10 +121,11 @@
           default-expand-all
           node-key="id"
           :default-checked-keys="defaultList"
+          ref="tree"
         ></el-tree>
         <span slot="footer" class="dialog-footer">
           <el-button @click="onClose">取 消</el-button>
-          <el-button type="primary">确 定</el-button>
+          <el-button type="primary" @click="confirmAllot">确 定</el-button>
         </span>
       </el-dialog>
     </div>
@@ -126,7 +133,13 @@
 </template>
 
 <script>
-import { addSysRoleAPI, getCompanyInfoAPI, getSysRoleAPI } from '@/api/setting'
+import {
+  addSysRoleAPI,
+  assignPerm,
+  getCompanyInfoAPI,
+  getSysRoleAPI,
+  getSysRoleByidAPI
+} from '@/api/setting'
 import { getPermissionListAPI } from '@/api/permission'
 import { dataToTress } from '@/utils/index'
 export default {
@@ -157,7 +170,9 @@ export default {
         label: 'name'
       },
       treeData: [],
-      defaultList: ['1', '1063315016368918528']
+      defaultList: ['1', '1063315016368918528'],
+      // 角色id
+      roleId: ''
     }
   },
 
@@ -210,15 +225,35 @@ export default {
     // 分配权限对话框
     onClose() {
       this.allotdialogShow = false
+      this.defaultList = []
     },
-    allotdialogShowFn() {
+    // 显示权限对话框
+    allotdialogShowFn(id) {
+      this.roleId = id
+      this.getSysRoleByid(id)
       this.allotdialogShow = true
     },
     // 获取角色权限列表
     async getPermissionList() {
       const data = await getPermissionListAPI()
-      console.log(data)
+      // console.log(data)
       this.treeData = dataToTress(data, '0')
+    },
+    // 根据id获取角色权限
+    async getSysRoleByid(id) {
+      const data = await getSysRoleByidAPI(id)
+      this.defaultList = data.permIds
+      // console.log(this.defaultList)
+    },
+    async confirmAllot() {
+      const permIds = this.$refs.tree.getCheckedKeys()
+      if (permIds.length <= 0) return
+      await assignPerm({
+        id: this.roleId,
+        permIds: permIds
+      })
+      this.$message.success('分配成功')
+      this.onClose()
     }
   }
 }
