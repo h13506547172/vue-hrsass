@@ -1,38 +1,38 @@
-// 自定义默认图片指令
+import store from '@/store'
+// 定义自定义指令
 export const imgError = {
-  inserted(el, binding) {
+  // 当被绑定的元素插入到 DOM 中时……
+  // 令绑定的元素插入到dom的时候 ,图片数据还没请求回来
+  inserted(el, { value }) {
+    // 监听dom img 图片加载失败的事件
     if (!el.src) {
-      // 如果图片地址不存在
-      el.src = binding.value
+      el.src = value
     } else {
-      // 404的时候,修改src为默认图片
-      el.onerror = () => {
-        // binding.value包含用户传递过来的值
-        el.src = binding.value
+      el.onerror = function () {
+        el.src = value
       }
     }
   },
-  update(el, binding) {
+  update(el, { value }) {
+    // 监听dom img 图片加载失败的事件
     if (!el.src) {
-      // 如果图片地址不存在
-      el.src = binding.value
+      el.src = value
     } else {
-      // 404的时候,修改src为默认图片
-      el.onerror = () => {
-        // binding.value包含用户传递过来的值
-        el.src = binding.value
+      el.onerror = function () {
+        el.src = value
       }
     }
-  }
+  },
 }
-import store from '@/store/index'
-// 按钮权限自定义指令
-export const isHave = {
+
+export const isHas = {
+  // bind: 指令和dom绑定
+  // inserted: 指令所绑定的元素插入到父节点
+  // update: 指令所绑定的Vnode
   inserted(el, binding) {
-    const have = store.state.permission.points.includes(binding.value)
-    // 没有权限
-    if (!have) {
+    const has = store.state.permission.points.includes(binding.value)
+    if (!has) {
       el.remove()
     }
-  }
+  },
 }

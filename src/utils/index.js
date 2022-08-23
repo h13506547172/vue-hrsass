@@ -17,8 +17,8 @@ export function parseTime(time, cFormat) {
   if (typeof time === 'object') {
     date = time
   } else {
-    if ((typeof time === 'string')) {
-      if ((/^[0-9]+$/.test(time))) {
+    if (typeof time === 'string') {
+      if (/^[0-9]+$/.test(time)) {
         // support "1548221490638"
         time = parseInt(time)
       } else {
@@ -28,7 +28,7 @@ export function parseTime(time, cFormat) {
       }
     }
 
-    if ((typeof time === 'number') && (time.toString().length === 10)) {
+    if (typeof time === 'number' && time.toString().length === 10) {
       time = time * 1000
     }
     date = new Date(time)
@@ -40,12 +40,14 @@ export function parseTime(time, cFormat) {
     h: date.getHours(),
     i: date.getMinutes(),
     s: date.getSeconds(),
-    a: date.getDay()
+    a: date.getDay(),
   }
   const time_str = format.replace(/{([ymdhisa])+}/g, (result, key) => {
     const value = formatObj[key]
     // Note: getDay() returns 0 on Sunday
-    if (key === 'a') { return ['日', '一', '二', '三', '四', '五', '六'][value ] }
+    if (key === 'a') {
+      return ['日', '一', '二', '三', '四', '五', '六'][value]
+    }
     return value.toString().padStart(2, '0')
   })
   return time_str
@@ -105,7 +107,7 @@ export function param2Obj(url) {
   }
   const obj = {}
   const searchArr = search.split('&')
-  searchArr.forEach(v => {
+  searchArr.forEach((v) => {
     const index = v.indexOf('=')
     if (index !== -1) {
       const name = v.substring(0, index)
@@ -117,23 +119,22 @@ export function param2Obj(url) {
 }
 
 /**
- * 
- * @param {*} list 
- * @param {*} 一级父id
- * @returns 树状数组
+ * 将list数据处理为treeList
+ * @param {*} data 要处理的数据
+ * @param {*} pid 父级id
+ * @returns treeList
  */
-export const dataToTress = (list, pid) => {
-  let newList = [];
-  list.forEach((item) => {
-    // 第一次将一级节点放入数组
+export function transListToTree(data, pid) {
+  const arr = []
+  data.forEach((item) => {
     if (item.pid === pid) {
-      // 再把自己的id传入函数，看看有没有自己的子节点
-      const children = dataToTress(list, item.id);
+      // 当前: item 就是1级数据 item.id
+      const children = transListToTree(data, item.id)
       if (children.length) {
-        item.children = children;
+        item.children = children
       }
-      newList.push(item);
+      arr.push(item)
     }
-  });
-  return newList;
-};
+  })
+  return arr
+}

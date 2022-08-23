@@ -1,74 +1,87 @@
-// 员工
 import request from '@/utils/request'
-// 获取部分员工的数据
-export function getEmployeesAPI() {
+
+/**
+ * 获取员工列表(简单)
+ * @returns promise
+ */
+export function getEmployeesApi() {
   return request({
     url: '/sys/user/simple',
-    method: 'GET'
   })
 }
+
 /**
- * 获取员工信息列表
- * @param {*} params { page: 1 size: 10}
+ * 获取员工列表
+ * @param {*} params {page, size}
  * @returns
  */
-export function getEmployeesListAPI(params) {
+export function getEmployeesInfoApi(params) {
   return request({
     url: '/sys/user',
-    method: 'GET',
-    params
+    params,
   })
 }
 
 /**
  * 删除员工接口
  * ****/
-export function delEmployeeAPI(id) {
+
+export function delEmployee(id) {
   return request({
     url: `/sys/user/${id}`,
-    method: 'delete'
+    method: 'delete',
   })
 }
+
 /** **
  *  新增员工的接口
  * **/
-export function addEmployeeAPI(data) {
+export function addEmployee(data) {
   return request({
     method: 'post',
     url: '/sys/user',
-    data
+    data,
   })
 }
-
-export function batchAddEmployeeAPI(data) {
+/**
+ * 批量导入员工
+ * @param {*} data 员工数组
+ */
+export function importEmployees(data) {
   return request({
     method: 'post',
     url: '/sys/user/batch',
-    data
+    data,
   })
 }
 
-//  保存员工基本信息 
-export function saveEmployeeInfoAPI(id,data) {
+/** *
+ *  读取用户详情的基础信息
+ * **/
+export function getPersonalDetail(id) {
   return request({
-    method: 'PUT',
-    url: `/sys/user/${id}`,
-    data
+    url: `/employees/${id}/personalInfo`,
   })
 }
 
-// 获取员工个人信息 /employees/{id}/personalInfo
-export function getEmployeesPersonalInfoAPI(id) {
+/** *
+ *  更新用户详情的基础信息
+ * **/
+export function updatePersonal(data) {
   return request({
-    url: `/employees/${id}/personalInfo`,
-    method: 'GET'
+    url: `/employees/${data.userId}/personalInfo`,
+    method: 'put',
+    data,
   })
 }
-// 保存员工个人信息 /employees/{id}/personalInfo
-export function saveEmployeePersonalInfoAPI(id,data) {
+
+/** *
+ * 给用户分配角色
+ * ***/
+export function assignRoles(data) {
   return request({
-    method: 'PUT',
-    url: `/employees/${id}/personalInfo`,
-    data
+    url: '/sys/user/assignRoles',
+    data,
+    method: 'put',
   })
 }

@@ -4,9 +4,10 @@ import getters from './getters'
 import app from './modules/app'
 import settings from './modules/settings'
 import user from './modules/user'
-import permission from "./modules/permission";
-// 持久化存储
+import permission from './modules/permission'
 import createVuexPersisted from 'vuex-persistedstate'
+import tagsView from "./modules/tagsView";
+
 Vue.use(Vuex)
 
 const store = new Vuex.Store({
@@ -14,21 +15,21 @@ const store = new Vuex.Store({
     app,
     settings,
     user,
-    permission
+    permission,
+    tagsView
   },
   getters,
   plugins: [
-    // 默认是所有vuex模块中的state的值存入本地
     createVuexPersisted({
       reducer(state) {
         return {
           user: {
-            token: state.user.token
-          }
+            token: state.user.token,
+          },
         }
-      }
-    })
-  ]
+      },
+    }),
+  ],
 })
 
 export default store

@@ -1,46 +1,44 @@
-import { loginAPI, getUserInfoAPI, getUserMoreInfoAPI } from '@/api/user'
+import { getUserDetail, getUserInfoApi, login } from '@/api/user.js'
 import { setTokenTime } from '@/utils/auth'
-import { resetRouter } from '@/router/index'
+import { resetRouter } from '@/router'
 export default {
   namespaced: true,
   state: {
     token: '',
-    userInfo: {}
+    userInfo: {},
   },
   mutations: {
-    setToken(state, data) {
-      state.token = data
+    setToken(state, payload) {
+      state.token = payload
     },
-    setUserInfo(state, data) {
-      state.userInfo = data
-    }
+    setUserInfo(state, payload) {
+      state.userInfo = payload
+    },
   },
   actions: {
-    async asyncSetToken(context, data) {
-      // 发送请求获取token
-      const restoken = await loginAPI(data)
-      const token = restoken
-      context.commit('setToken', token)
-      // 存储token时间戳
-      setTokenTime(Date.now())
+    // 登录获取token
+    async getToken(context, payload) {
+      // 发送请求得来的
+      const res = await login(payload)
+      context.commit('setToken', res)
+      setTokenTime()
     },
-    async asyncSetUserInfo(context) {
-      // 获取用户的基本和详细数据，并合并
-      const res = await getUserInfoAPI()
-      const res2 = await getUserMoreInfoAPI(res.userId)
-      context.commit('setUserInfo', { ...res, ...res2 })
-      // actions中可以return数据出去，结果是一个promise
-      return res
+    // 获取用户信息
+    async getUserInfo(context) {
+      const userBaseInfo = await getUserInfoApi()
+      const userInfo = await getUserDetail(userBaseInfo.userId)
+      context.commit('setUserInfo', { ...userBaseInfo, ...userInfo })
+      // 在这里通过userBaseInfo 处理动态路由
+      // actions 内部可以通过return将数据传递出去, 类似then中的return
+      return userBaseInfo
     },
     // 退出
     logout(context) {
       context.commit('setToken', '')
       context.commit('setUserInfo', {})
-      // 重置路由
       resetRouter()
-      // 清空vuex中的动态路由数据
-      context.commit('permission/setRouters', [], { root: true })
-    }
+      // {root: true} context 相当于全局的context
+      context.commit('permission/setRoutes', [], { root: true })
+    },
   },
-  getters: {}
 }

@@ -1,71 +1,60 @@
+// 导出一个axios的实例  而且这个实例要有请求拦截器 响应拦截器
 import axios from 'axios'
-import store from '@/store/index'
-// 单独引入element的消息提示
 import { Message } from 'element-ui'
-// 引入cookies方法
-import { getTokenTime } from './auth'
-// 引入router实例
-import router from "../router/index";
-const service = axios.create({
-  baseURL: process.env.VUE_APP_BASE_API
-})
-// token是否过期
-const timeOut = () => {
-  const tokenTime = getTokenTime()
-  const nowTime = Date.now()
-  return nowTime - tokenTime > 7200 * 1000
-}
-// 添加请求拦截器
-service.interceptors.request.use(
-  async function (config) {
-    // 在发送请求之前如果token存在就添加请求头
-    if (store.state.user.token) {
-      //如果token过期就跳转登录
-      if (timeOut()) {
-        // 跳转到登录页
-        await store.dispatch('user/logout')
-        router.push('/login')
-        // 返回一个错误对象
-        return Promise.reject(new Error('登录过期'))
-      } else {
-        config.headers.Authorization = 'Bearer ' + store.state.user.token
-      }
-    }
-    //config是本次请求的请求配置对象,一定要返回
-    return config
-  },
-  function (error) {
-    // 对请求错误做些什么
-    return Promise.reject(error)
-  }
-)
+import store from '@/store'
+import { getTokenTime } from '@/utils/auth'
+import router from '@/router'
 
-// 响应拦截器
+function isTimeOut() {
+  const currentTime = Date.now()
+  const tokenTime = getTokenTime()
+  const timeout = 2 * 60 * 60 * 1000
+  return currentTime - tokenTime > timeout
+}
+
+const service = axios.create({
+  baseURL: process.env.VUE_APP_BASE_API,
+  // 3套
+  // 开发期间
+  // 测试的
+  // 线上的
+  timeout: 5000,
+}) // 创建一个axios的实例
+service.interceptors.request.use(async (config) => {
+  // 当前请求的配置
+  if (store.state.user.token) {
+    if (isTimeOut()) {
+      await store.dispatch('user/logout')
+      router.push('/login')
+      return Promise.reject(new Error('登录过期'))
+    } else {
+      config.headers.Authorization = 'Bearer ' + store.state.user.token
+    }
+  }
+  return config
+}) // 请求拦截器
 service.interceptors.response.use(
-  function (res) {
-    // 对返回的数据进行处理如果成功就返回数据
-    const { message, data, success } = res.data
+  (res) => {
+    // 请求成功的函数
+    const { success, data, message } = res.data
     if (success) {
       return data
     }
-    // 失败就抛出错误
     Message.error(message)
     return Promise.reject(new Error(message))
   },
   async function (error) {
-    // 后端判断token过期的情况
-    if (error.response?.status === 401) {
-      // 跳转到登录页
+    // 对响应错误做点什么
+    // es11
+    if (error?.response?.status === 401) {
+      Message.error('登录过期')
       await store.dispatch('user/logout')
       router.push('/login')
-      Message.error('登录过期，请重新登录')
     } else {
       Message.error(error.message)
-      
     }
-    
+
     return Promise.reject(error)
   }
-)
-
-export default service
+) // 响应拦截器
+export default service // 导出axios实例

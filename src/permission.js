@@ -1,29 +1,45 @@
-// 登录权限的代码区域
-import router from '@/router/index'
-// import { asyncRoutes } from '@/router/index'
-// console.log(asyncRoutes)
-import store from '@/store/index'
+import router, { asyncRoutes } from '@/router'
+import store from '@/store'
+// 路由(全局)前置守卫
+// 路由(全局)后置守卫
+// 路由独享守卫
+// 组件内守卫
+// 会在所有路由进入之前触发
+// to: 去哪里的路由信息
+// from: 来自于哪个路由的信息
+// next: 是否进入
 const whiteList = ['/login', '/404']
 router.beforeEach(async (to, from, next) => {
-  // 如果已登录
-  if (store.state.user.token) {
-    // 获取用户信息，并且不需要持久化,有数据就不请求
+  const token = store.state.user.token
+  if (token) {
     if (!store.state.user.userInfo.userId) {
-      // 要先获取数据，否则可能导致后面依赖这个数据的请求出错
-      const { roles } = await store.dispatch('user/asyncSetUserInfo')
-      await store.dispatch('permission/asyncSetRouters', roles)
-      // 按钮权限
-      await store.dispatch('permission/asyncSetPoints', roles.points)
-      return next(to.path) // 第一次进入页面，路由还没生成，要再次触发路由守卫
+      // 获取用户信息 store.dispatch的返回值是promise
+      const { roles } = await store.dispatch('user/getUserInfo')
+
+      await store.dispatch('permission/filterRoutes', roles)
+      await store.dispatch('permission/setPointsAction', roles.points)
+      next(to.path)
     }
-    // 去登录页面跳首页
-    if (to.path === '/login') return next('/')
-    // 不是就正常跳转
-    return next()
+
+    // 1. 登录
+    // 是否进入登录页
+    if (to.path === '/login') {
+      // 1.1 是 跳到首页
+      next('/')
+    } else {
+      // 1.2 不是 直接进入
+      next()
+    }
   } else {
-    // 未登录,前往白名单页面
-    if (whiteList.includes(to.path)) return next()
-    // 非白名单前往登录页面
-    return next('/login')
+    // 2. 未登录
+    // 访问的是否在白名单(未登录也能访问的页面)
+    const isCludes = whiteList.includes(to.path)
+    if (isCludes) {
+      // 2.1 在白名单 放行
+      next()
+    } else {
+      // 2.2 不在白名单(不登录不能访问) 跳到登录页
+      next('/login')
+    }
   }
 })

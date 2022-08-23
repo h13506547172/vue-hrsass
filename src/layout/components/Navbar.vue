@@ -6,28 +6,30 @@
       @toggleClick="toggleSideBar"
     />
 
+    <!-- <breadcrumb class="breadcrumb-container" /> -->
     <div class="app-breadcrumb">
-      {{ $store.state.user.userInfo.username }}
+      {{ $store.state.user.userInfo.companyName }}
       <span class="breadBtn">体验版</span>
     </div>
-    <!-- 右侧登出菜单 -->
     <div class="right-menu">
+      <toggleLang></toggleLang>
+      <fullScreen></fullScreen>
       <el-dropdown class="avatar-container" trigger="click">
         <div class="avatar-wrapper">
           <img
-            :src="$store.state.user.userInfo.staffPhoto"
+            :src="$store.state.user.userInfo.staffPhoto + '123'"
             class="user-avatar"
             v-imgError="defaultImg"
           />
-          <span>{{ $store.state.user.userInfo.companyName }}</span>
+          <span>{{ $store.state.user.userInfo.username }}</span>
           <i class="el-icon-caret-bottom" />
         </div>
         <el-dropdown-menu slot="dropdown" class="user-dropdown">
           <router-link to="/">
-            <el-dropdown-item> 首页 </el-dropdown-item>
+            <el-dropdown-item> Home </el-dropdown-item>
           </router-link>
           <el-dropdown-item divided @click.native="logout">
-            <span style="display: block">登出</span>
+            <span style="display: block">Log Out</span>
           </el-dropdown-item>
         </el-dropdown-menu>
       </el-dropdown>
@@ -39,8 +41,10 @@
 import { mapGetters } from 'vuex'
 import Breadcrumb from '@/components/Breadcrumb'
 import Hamburger from '@/components/Hamburger'
-import defaultImg from '@/assets/common/68775e15bc12b22a0c38d8d556863767.jpeg'
+import defaultImg from '@/assets/common/head.jpg'
+
 export default {
+  // 如果想在data中定义本地图片路径,需要先引入
   data() {
     return {
       defaultImg
@@ -73,21 +77,6 @@ export default {
   background-image: -webkit-linear-gradient(left, #3d6df8, #5b8cff);
   box-shadow: 0 1px 4px rgba(0, 21, 41, 0.08);
 
-  .hamburger-container {
-    line-height: 46px;
-    height: 100%;
-    float: left;
-    cursor: pointer;
-    transition: background 0.3s;
-    -webkit-tap-highlight-color: transparent;
-    fill: currentColor;
-    color: #fff;
-
-    &:hover {
-      background: rgba(0, 0, 0, 0.025);
-    }
-  }
-  // navbar左侧文字样式
   .app-breadcrumb {
     display: inline-block;
     font-size: 18px;
@@ -107,11 +96,27 @@ export default {
     }
   }
 
+  .hamburger-container {
+    line-height: 46px;
+    height: 100%;
+    float: left;
+    cursor: pointer;
+    transition: background 0.3s;
+    -webkit-tap-highlight-color: transparent;
+    color: #fff;
+    fill: currentColor;
+
+    &:hover {
+      background: rgba(0, 0, 0, 0.025);
+    }
+  }
+
   .breadcrumb-container {
     float: left;
   }
 
   .right-menu {
+    display: flex;
     float: right;
     height: 100%;
     line-height: 50px;
@@ -146,12 +151,17 @@ export default {
         display: flex;
         align-items: center;
         color: #fff;
+        cursor: pointer;
+
+        span {
+          margin: 0 3px;
+        }
 
         .user-avatar {
           cursor: pointer;
           width: 40px;
           height: 40px;
-          border-radius: 50%;
+          border-radius: 10px;
         }
 
         .el-icon-caret-bottom {

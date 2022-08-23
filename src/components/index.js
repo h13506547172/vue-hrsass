@@ -1,11 +1,22 @@
-import PageTools from './PageTools'
-import UpdateExcel from "./UpdateExcel";
-import UploadImg from "./UploadImg";
-const components = [PageTools,UpdateExcel,UploadImg]
+import PageTools from '@/components/PageTools'
+import MyTest from '@/components/MyTest'
+import UploadExcel from '@/components/UploadExcel'
+import UploadImg from '@/components/UploadImg'
+import Calendar from '@/components/Calendar'
+import fullScreen from '@/components/fullScreen'
+import toggleLang from "@/components/toggleLang";
+const components = [
+  PageTools,
+  MyTest,
+  UploadExcel,
+  UploadImg,
+  Calendar,
+  fullScreen,
+  toggleLang
+]
 export default {
   install(Vue) {
     components.forEach((component) => {
-      // 要在每个组件里面写好name
       Vue.component(component.name, component)
     })
   }

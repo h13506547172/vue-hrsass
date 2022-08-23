@@ -1,38 +1,47 @@
 import request from '@/utils/request'
 
-export function loginAPI(data) {
+/**
+ * 登录请求
+ * @param {Object} data password mobile
+ * @returns promise
+ */
+export function login(data) {
   return request({
     url: '/sys/login',
-    method: 'post',
-    data
+    method: 'POST',
+    data,
   })
 }
-
-// 获取用户基本信息的api
-export function getUserInfoAPI() {
+/**
+ * 获取用户信息
+ * @returns promise
+ */
+export function getUserInfoApi() {
   return request({
     url: '/sys/profile',
-    method: 'post',
-    headers: { 'Content-Type': 'application/x-www-form-urlencoded' }
+    method: 'POST',
   })
 }
 
-// 获取用户详细信息的api
-export function getUserMoreInfoAPI(id) {
+/**
+ * 根据用户id获取员工详情数据
+ * @param {String} id 用户id
+ * @returns promise
+ */
+export function getUserDetail(id) {
   return request({
     url: '/sys/user/' + id,
-    method: 'GET'
   })
 }
 
-// 给用户分配角色 /sys/user/assignRoles
-export function assignRolesAPI(id, roleIds) {
+/** *
+ *
+ * 保存员工的基本信息
+ * **/
+export function saveUserDetailById(data) {
   return request({
-    url: '/sys/user/assignRoles',
-    method: 'PUT',
-    data: {
-      id,
-      roleIds
-    }
+    url: `/sys/user/${data.id}`,
+    method: 'put',
+    data,
   })
 }

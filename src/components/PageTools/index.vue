@@ -1,15 +1,15 @@
 <template>
   <el-card class="box-card">
-    <el-row>
-      <el-col :span="12">
-        <el-tag>
-          <i class="el-icon-info" v-if="iconShow"></i>
-          <slot name="left"></slot>
+    <el-row type="flex">
+      <el-col>
+        <el-tag v-if="isShowLeft">
+          <i :class="leftIcon"></i>
+          <slot name="left-tag" />
         </el-tag>
       </el-col>
-      <el-col :span="12">
+      <el-col>
         <el-row type="flex" justify="end">
-          <slot name="right"></slot>
+          <slot name="right" />
         </el-row>
       </el-col>
     </el-row>
@@ -19,20 +19,29 @@
 <script>
 export default {
   name: 'PageTools',
-  props: {
-    iconShow: {
-      type: Boolean,
-      default: true
-    }
-  },
   data() {
     return {}
   },
 
+  props: {
+    leftIcon: {
+      type: String,
+      default: 'el-icon-info',
+    },
+    isShowLeft: {
+      type: Boolean,
+      default: true,
+    },
+  },
+
   created() {},
 
-  methods: {}
+  methods: {},
 }
 </script>
 
-<style lang="less" scoped></style>
+<style scoped lang="scss">
+.box-card {
+  margin: 10px 0;
+}
+</style>

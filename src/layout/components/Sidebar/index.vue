@@ -34,9 +34,9 @@ export default {
   computed: {
     ...mapGetters(['sidebar']),
     routes() {
-      // 获取到所有的路由规则（不包括动态的）
-      // return this.$router.options.routes
-      return this.$store.state.permission.routers
+      // 可以获取到所有路由规则(动态添加的)
+      //  我们自己去维护一个路由规则(所有路由)
+      return this.$store.state.permission.routes
     },
     activeMenu() {
       const route = this.$route
@@ -55,7 +55,7 @@ export default {
     },
     isCollapse() {
       return !this.sidebar.opened
-    }
-  }
+    },
+  },
 }
 </script>

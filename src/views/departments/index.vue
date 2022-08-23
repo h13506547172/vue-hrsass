@@ -1,95 +1,84 @@
 <template>
   <div class="dashboard-container">
     <div class="app-container">
-      <el-card class="box-card">
+      <el-card v-loading="loading" class="box-card">
         <!-- 头部 -->
-        <TreeTools
-          :nodeName="{ name: '传值教育', manager: '负责人' }"
-          :isRoot="false"
-          @add="dialogVisible = true"
-        ></TreeTools>
+        <tree-tools @add="showAddDept" :isRoot="true" :treeNode="company" />
         <!-- 树形 -->
-        <el-tree :data="treeData" :props="defaultProps" v-loading="loading">
-          <template v-slot="scope">
-            <TreeTools
-              :nodeName="scope.data"
-              :isRoot="true"
-              @remove="getDepartment"
-              @add="passNode"
-              @edit="editFn"
-            ></TreeTools>
+        <el-tree :data="treeData" :props="defaultProps" default-expand-all>
+          <!-- 这是作用域插槽 -->
+          <!-- v-slot 获取组件内部slot提供的数据 -->
+          <template v-slot="{ data }">
+            <tree-tools
+              @add="showAddDept"
+              @remove="loadDepts"
+              @edit="showEdit"
+              :treeNode="data"
+            />
           </template>
         </el-tree>
-        <!-- 添加弹出层 -->
-        <addPop
-          ref="addPop"
-          :dialogVisible="dialogVisible"
-          :curNode="curNode"
-          @updata="dialogVisible = $event"
-          @success="getDepartment"
-        ></addPop>
       </el-card>
     </div>
+
+    <!-- 添加部门弹层 -->
+    <add-dept
+      ref="addDept"
+      @add-success="loadDepts"
+      :visible.sync="dialogVisible"
+      :currentNode="currentNode"
+    />
   </div>
 </template>
 
 <script>
 import TreeTools from './components/tree-tools.vue'
-import { getDepartmentAPI } from '@/api/departments'
-// 引入转换树状数组的方法
-import { dataToTress } from '@/utils'
-import addPop from './components/addPop.vue'
+import { getDeptsApi } from '@/api/departments'
+import { transListToTree } from '@/utils'
+import AddDept from './components/add-dept'
 export default {
-  components: {
-    TreeTools,
-    addPop
-  },
   data() {
     return {
       treeData: [
         { name: '总裁办', children: [{ name: '董事会' }] },
         { name: '行政部' },
-        { name: '人事部' }
+        { name: '人事部' },
       ],
       defaultProps: {
-        label: 'name'
+        label: 'name', // 将data中哪个数据名显示到树形页面中
+        // children: 'child', // 树形默认查找子节点通过childten
       },
-      isRoot: true,
-      // 添加弹出层
+      company: { name: '传智教育', manager: '负责人' },
       dialogVisible: false,
-      // 传递的部门数据
-      curNode: {},
-      // 加载
-      loading: false
+      currentNode: {},
+      loading: false,
     }
+  },
+
+  components: {
+    TreeTools,
+    AddDept,
   },
 
   created() {
-    this.getDepartment()
+    this.loadDepts()
   },
 
   methods: {
-    // 获取数据
-    async getDepartment() {
+    async loadDepts() {
       this.loading = true
-      const data = await getDepartmentAPI()
-      // console.log(data)
-      this.treeData = dataToTress(data.depts, '')
+      const res = await getDeptsApi()
+      this.treeData = transListToTree(res.depts, '')
       this.loading = false
     },
-    // 点击添加部门，传递部门信息
-    passNode(val) {
+    showAddDept(val) {
       this.dialogVisible = true
-      // console.log(val)
-      this.curNode = val
+      this.currentNode = val
     },
-    // 编辑部门
-    editFn(val) {
+    showEdit(val) {
       this.dialogVisible = true
-      // 调用子组件的方法
-      this.$refs.addPop.getDeptById(val.id)
-    }
-  }
+      this.$refs.addDept.getDeptById(val.id)
+    },
+  },
 }
 </script>
 

@@ -1,13 +1,11 @@
 export default {
-  btnMapPermission: {
+  employees: {
     add: 'employees-add',
-    edit: 'employees-edit',
     import: 'employees-import',
-    delete: 'employees-delete',
-    export: 'employees-export'
+    del: 'employees-del',
   },
   roles: {
     add: 'roles-add',
-    edit: 'roles-edit'  
-  }
+    edit: 'roles-edit',
+  },
 }

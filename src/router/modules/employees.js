@@ -3,23 +3,25 @@ export default {
   path: '/employees',
   component: Layout,
   meta: {
-    id: 'employees', // 和后端做好约定
+    id: 'employees', // 用来和后端权限做约定的
   },
   children: [
     {
       path: '',
       component: () => import('@/views/employees'),
-      meta: { title: '员工', icon: 'people' }
+      meta: { title: '员工', icon: 'people' },
+      name: 'employees',
     },
     {
-      path: '/employees/detail/:id',
+      path: 'detail/:id',
       component: () => import('@/views/employees/detail'),
-      hidden: true
+      props: true,
+      hidden: true,
     },
     {
-      path: '/employees/print/:id',
-      component: () => import(`@/views/employees/print`),
-      hidden: true
-    }
-  ]
+      path: 'print/:id',
+      component: () => import('@/views/employees/print'),
+      hidden: true,
+    },
+  ],
 }
